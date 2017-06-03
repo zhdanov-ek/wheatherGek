@@ -1,13 +1,27 @@
 package com.example.gek.weahtergek.models;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by gek on 03.06.17.
  */
 
 public class Country {
+    @SerializedName("ID")
+    @Expose
     private String id;
+
+    @SerializedName("LocalizedName")
+    @Expose
     private String localizedName;
+
+    @SerializedName("EnglishName")
+    @Expose
     private String englishName;
+
+    public Country() {
+    }
 
     public String getId() {
         return id;
