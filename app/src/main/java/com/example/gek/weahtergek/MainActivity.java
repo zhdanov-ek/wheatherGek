@@ -2,6 +2,8 @@ package com.example.gek.weahtergek;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.example.gek.weahtergek.models.City;
@@ -20,13 +22,16 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MAIN";
     private Realm mRealm;
+    private RecyclerView rv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mRealm = Realm.getDefaultInstance();
 
+        loadCities();
 
         findViewById(R.id.btnSearch).setOnClickListener(v -> {
             openSearchDialog();
@@ -68,5 +73,14 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "showCities: " +  city.getEnglishName() + " (" + city.getKey() + ")\n");
         }
         Log.d(TAG, "============================================= ");
+    }
+
+    private void loadCities(){
+        rv = (RecyclerView) findViewById(R.id.rv);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        CitiesAdapter adapter = new CitiesAdapter(
+                mRealm.where(City.class).findAll(),
+                getBaseContext());
+        rv.setAdapter(adapter);
     }
 }

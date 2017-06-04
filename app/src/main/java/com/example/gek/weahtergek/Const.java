@@ -10,4 +10,8 @@ public class Const {
 
     public static final String CITY_KEY = "key";
 
+    public static final String EXTRA_CITY_NAME = "city_name";
+    public static final String EXTRA_CITY_KEY = "city_key";
+    public static final String EXTRA_CITY_COUNTRY = "city_country";
+
 }

@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">weahterGek</string>
+    <string name="app_name">weatherGek</string>
     <string name="search">Search</string>
     <string name="cancel">Cancel</string>
+    <string name="detail">Detail</string>
+    <string name="remove">Remove</string>
     <string name="hint_city_name">Name of city</string>
 
     <string name="mes_input_city">Search new city</string>
