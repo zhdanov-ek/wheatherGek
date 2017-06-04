@@ -3,13 +3,9 @@ package com.example.gek.weahtergek;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.gek.weahtergek.models.City;
 import com.example.gek.weahtergek.rest.ApiFactory;
@@ -17,6 +13,8 @@ import com.example.gek.weahtergek.rest.WeatherInterface;
 
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -64,7 +62,25 @@ public class SearchDialog extends DialogFragment {
                 public void onResponse(Call<List<City>> call, Response<List<City>> response) {
                     Log.d(TAG, "onResponse: api return list. Length = " + response.body().size());
                     List<City> cities = response.body();
-                    Log.d(TAG, "onResponse: " + cities.get(0).getEnglishName());
+                    Realm realm = Realm.getDefaultInstance();
+                    try {
+                        for (City city: cities) {
+                            RealmResults<City> result = realm.where(City.class)
+                                    .equalTo(Const.CITY_KEY, city.getKey())
+                                    .findAll();
+
+                            // if city new then add to DB
+                            if (result.size() == 0){
+                                realm.beginTransaction();
+                                realm.insertOrUpdate(city);
+                                realm.commitTransaction();
+                            }
+                        }
+
+                    } finally {
+                        realm.close();
+                    }
+
                 }
 
                 @Override

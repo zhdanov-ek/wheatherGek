@@ -3,11 +3,13 @@ package com.example.gek.weahtergek.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import io.realm.RealmObject;
+
 /**
  * Created by gek on 03.06.17.
  */
 
-public class Country {
+public class Country extends RealmObject{
     @SerializedName("ID")
     @Expose
     private String id;

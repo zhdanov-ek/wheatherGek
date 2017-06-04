@@ -4,26 +4,36 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.gek.weahtergek.models.City;
 import com.example.gek.weahtergek.models.Condition;
 import com.example.gek.weahtergek.rest.ApiFactory;
 import com.example.gek.weahtergek.rest.ConditionInterface;
 
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MAIN";
+    private Realm mRealm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mRealm = Realm.getDefaultInstance();
+
 
         findViewById(R.id.btnSearch).setOnClickListener(v -> {
             openSearchDialog();
+        });
+
+        findViewById(R.id.btnShow).setOnClickListener(v -> {
+            showCities();
         });
 
         ConditionInterface api = ApiFactory.getConditionInterface();
@@ -49,5 +59,14 @@ public class MainActivity extends AppCompatActivity {
     private void openSearchDialog(){
         SearchDialog searchDialog = new SearchDialog();
         searchDialog.show(getFragmentManager(), "dialog search");
+    }
+
+    private void showCities(){
+        RealmResults<City> cities = mRealm.where(City.class).findAll();
+        Log.d(TAG, "============================================= ");
+        for (City city : cities) {
+            Log.d(TAG, "showCities: " +  city.getEnglishName() + " (" + city.getKey() + ")\n");
+        }
+        Log.d(TAG, "============================================= ");
     }
 }
