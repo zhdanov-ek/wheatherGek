@@ -9,6 +9,7 @@ public class Const {
     public static final String SEARCH_CITY = "http://dataservice.accuweather.com/locations/v1/cities/search";
 
     public static final String CITY_KEY = "key";
+    public static final String CITY_ENGLISH_NAME = "englishName";
 
     public static final String EXTRA_CITY_NAME = "city_name";
     public static final String EXTRA_CITY_KEY = "city_key";

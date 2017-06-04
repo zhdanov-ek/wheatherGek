@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.gek.weahtergek.models.City;
 import com.example.gek.weahtergek.rest.ApiFactory;
@@ -35,7 +36,6 @@ public class SearchDialog extends DialogFragment {
 
         builder.setView(R.layout.edit_text_search);
 
-
         builder.setPositiveButton(R.string.search, (dialog, id) -> {
                     etSearch = (EditText) ((AlertDialog)dialog).findViewById(R.id.etSearch);
                     makeRequest(etSearch);
@@ -60,27 +60,29 @@ public class SearchDialog extends DialogFragment {
             call.enqueue(new Callback<List<City>>() {
                 @Override
                 public void onResponse(Call<List<City>> call, Response<List<City>> response) {
-                    Log.d(TAG, "onResponse: api return list. Length = " + response.body().size());
-                    List<City> cities = response.body();
-                    Realm realm = Realm.getDefaultInstance();
-                    try {
-                        for (City city: cities) {
-                            RealmResults<City> result = realm.where(City.class)
-                                    .equalTo(Const.CITY_KEY, city.getKey())
-                                    .findAll();
+                    if ((response.isSuccessful()) && (!response.body().isEmpty())){
+                        List<City> cities = response.body();
+                        Realm realm = Realm.getDefaultInstance();
+                        try {
+                            for (City city: cities) {
+                                RealmResults<City> result = realm.where(City.class)
+                                        .equalTo(Const.CITY_KEY, city.getKey())
+                                        .findAll();
 
-                            // if city new then add to DB
-                            if (result.size() == 0){
-                                realm.beginTransaction();
-                                realm.insertOrUpdate(city);
-                                realm.commitTransaction();
+                                // if city new then add to DB
+                                if (result.size() == 0){
+                                    realm.beginTransaction();
+                                    realm.insertOrUpdate(city);
+                                    realm.commitTransaction();
+                                }
                             }
+
+                        } finally {
+                            realm.close();
                         }
-
-                    } finally {
-                        realm.close();
+                    } else {
+                        Log.d(TAG, "onResponse: " + response.message());
                     }
-
                 }
 
                 @Override

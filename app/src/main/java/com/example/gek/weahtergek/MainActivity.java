@@ -7,22 +7,29 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.example.gek.weahtergek.models.City;
-import com.example.gek.weahtergek.models.Condition;
-import com.example.gek.weahtergek.rest.ApiFactory;
-import com.example.gek.weahtergek.rest.ConditionInterface;
 
-import java.util.List;
+import java.util.Random;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MAIN";
     private Realm mRealm;
     private RecyclerView rv;
+
+    private final RealmChangeListener<RealmResults<City>> changeListener =
+            cities -> updateUi(cities);
+
+    private void updateUi(RealmResults<City> cities){
+        if (rv.getAdapter() == null){
+            rv.setAdapter(new CitiesAdapter(cities, getBaseContext()));
+        } else {
+            rv.getAdapter().notifyDataSetChanged();
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,27 +44,8 @@ public class MainActivity extends AppCompatActivity {
             openSearchDialog();
         });
 
-        findViewById(R.id.btnShow).setOnClickListener(v -> {
-            showCities();
-        });
-
-        ConditionInterface api = ApiFactory.getConditionInterface();
-        Call<List<Condition>> call = api.getCondition(Const.KEY);
-        call.enqueue(new Callback<List<Condition>>() {
-            @Override
-            public void onResponse(Call<List<Condition>> call, Response<List<Condition>> response) {
-                Log.d(TAG, "onResponse: ");
-                if (response.isSuccessful()){
-                    List<Condition> cond = response.body();
-                    Log.d(TAG, "onResponse: successful");
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<List<Condition>> call, Throwable t) {
-                Log.d(TAG, "onFailure: " + t.getMessage());
-            }
+        findViewById(R.id.btnClone).setOnClickListener(v -> {
+            cloneCity();
         });
     }
 
@@ -66,21 +54,35 @@ public class MainActivity extends AppCompatActivity {
         searchDialog.show(getFragmentManager(), "dialog search");
     }
 
-    private void showCities(){
-        RealmResults<City> cities = mRealm.where(City.class).findAll();
-        Log.d(TAG, "============================================= ");
-        for (City city : cities) {
-            Log.d(TAG, "showCities: " +  city.getEnglishName() + " (" + city.getKey() + ")\n");
-        }
-        Log.d(TAG, "============================================= ");
-    }
 
     private void loadCities(){
         rv = (RecyclerView) findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(this));
-        CitiesAdapter adapter = new CitiesAdapter(
-                mRealm.where(City.class).findAll(),
-                getBaseContext());
-        rv.setAdapter(adapter);
+        final RealmResults<City> cities = mRealm.where(City.class).findAll();
+        cities.addChangeListener(changeListener);
+        updateUi(cities);
+    }
+
+    private void cloneCity(){
+        City city = mRealm
+                .where(City.class)
+                .findFirst();
+        City newCity = new City();
+        int num = new Random().nextInt(50);
+        newCity.setEnglishName(city.getEnglishName() + num);
+        newCity.setLocalizedName(city.getLocalizedName() + num);
+        newCity.setKey(city.getKey() + num);
+        newCity.setCountry(city.getCountry());
+
+        mRealm.beginTransaction();
+        mRealm.insert(newCity);
+        mRealm.commitTransaction();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        mRealm.close();
+        super.onDestroy();
     }
 }

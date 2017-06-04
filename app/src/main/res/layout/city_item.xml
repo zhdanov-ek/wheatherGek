@@ -3,13 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="70dp"
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/tvCityName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Name of city"/>
+        tools:text="Name of city"
+        android:textSize="18sp"/>
 
     <TextView
         android:id="@+id/tvCityCountry"

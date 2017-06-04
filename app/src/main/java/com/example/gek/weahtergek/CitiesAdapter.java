@@ -15,17 +15,19 @@ import com.example.gek.weahtergek.models.City;
 import java.util.List;
 import java.util.zip.Inflater;
 
+import io.realm.RealmResults;
+
 /**
  * Created by gek on 04.06.17.
  */
 
 public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.CityViewHolder> {
 
-    private List<City> cities;
+    private RealmResults<City> cities;
     private Context ctx;
     private Inflater inflater;
 
-    public CitiesAdapter(List<City> cities, Context ctx) {
+    public CitiesAdapter(RealmResults<City> cities, Context ctx) {
         this.cities = cities;
         this.ctx = ctx;
     }
@@ -61,7 +63,6 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.CityViewHo
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(ctx, tvCityName.getText(), Toast.LENGTH_SHORT).show();
             Intent intentCondition = new Intent(ctx, CityActivity.class);
             intentCondition.putExtra(
                     Const.EXTRA_CITY_NAME,
